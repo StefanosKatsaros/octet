@@ -23,6 +23,7 @@
 #include <fstream>
 #include <vector>
 
+
 using namespace std;
 
 namespace octet {
@@ -67,10 +68,6 @@ namespace octet {
 			// set up opengl to draw textured triangles using sampler 0 (GL_TEXTURE0)
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texture);
-
-			// use "old skool" rendering
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			shader.render(modelToProjection, 0);
 
 			// this is an array of the positions of the corners of the sprite in 3D
@@ -146,14 +143,10 @@ namespace octet {
 
 
 
-	// DONT CHECK ABOVE FOR NOW
-
-
 	class invaderers_app : public octet::app {
 		// Matrix to transform points in our camera space to the world.
 		// This lets us move our camera
 		mat4t cameraToWorld;
-
 		// shader to draw a textured triangle
 		texture_shader texture_shader_;
 
@@ -166,21 +159,13 @@ namespace octet {
 			num_borders = 4,
 			num_invaderers = num_rows * num_cols,
 
-
-			num_rows_bananas = 1,
-			num_cols_bananas = 13,
-			num_bananas = num_rows_bananas * num_cols_bananas,
-
 			// sprite definitions
 			ship_sprite = 0,
 			game_over_sprite,
 			restart_sprite,
 			success_sprite,
 			nextWave_sprite,
-
 			holyBanana_sprite,
-
-			bananas_sprite,																			//MY SPRITE TRYOUT
 
 			first_invaderer_sprite,
 			last_invaderer_sprite = first_invaderer_sprite + num_invaderers - 1,
@@ -195,13 +180,7 @@ namespace octet {
 			last_border_sprite = first_border_sprite + num_borders - 1,
 
 			num_sprites,
-
-			first_bananas_sprite,
-			last_bananas_sprite = first_bananas_sprite + num_bananas - 1,
-
 		};
-
-		string enemy1 = "assets/invaderers/invaderer.gif";
 
 
 		// timers for missiles and bombs
@@ -215,15 +194,13 @@ namespace octet {
 		// game state
 		bool game_over;
 		bool loss;
-		bool reWave;
+		bool reWave;   
 		int score;
 
 		bool readFile = true;
 
 		// speed of enemy
 		float invader_velocity;
-
-		float bananas_velocity;
 
 		// sounds
 		ALuint whoosh;
@@ -254,7 +231,7 @@ namespace octet {
 
 			live_invaderers--;
 			score++;
-			if (live_invaderers == 0) {
+			if (live_invaderers == 0) {										// win sprite will appear if all enemies have died and user will be prompted with message to continue playing
 				game_over = true;
 				sprites[success_sprite].translate(-20, 0);
 				sprites[nextWave_sprite].translate(-18.3, -2.2);
@@ -266,9 +243,9 @@ namespace octet {
 		void on_hit_ship() {
 			ALuint source = get_sound_source();
 			alSourcei(source, AL_BUFFER, bang);
-			alSourcePlay(source);
-
-			if (--num_lives == 0) {
+			alSourcePlay(source);	
+			
+			if (--num_lives == 0) {											// lose sprite will appear if player has died and user will be prompted with message to replay
 				game_over = true;
 				loss = true;
 				sprites[game_over_sprite].translate(-20, 0.2);
@@ -300,77 +277,56 @@ namespace octet {
 
 			}
 			if (is_key_down(key_down)) {
-
+				
 				sprites[ship_sprite].translate(0, -ship_speed);
 				if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
 					sprites[ship_sprite].translate(0, +ship_speed);
 
 				}
-
 			}
-
-
 		}
 
+		void initEnemies() {														// enemy initialization
 
-		void initEnemies() {
+			string enemy = "assets/invaderers/invaderer.gif";
+			GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, enemy);
 
-			// COME HERE LATER !!!															//LOOK HERE!! ENEMIES ARE INITIALIZED!
-			//  if (is_key_going_down('K')) {
-
-
-
-			GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, enemy1);
-			//  GLuint invaderer_banana = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/holyBomb.gif");
-
-			if (reWave == true) {
-
-
-				reWave = false;
-
+			if (reWave == true) {													//will be initialized if the user wins the game, in order for enemies to respawn in the next wave
+				reWave = false;														// we set to false so only one wave comes at a time unless we say otherwise
 
 				for (int j = 0; j != 6; ++j) {								//		DETERMINES NUMBER OF ROWS AND COLUMNS
 					for (int i = 0; i != 14; ++i) {
 						assert(first_invaderer_sprite + i + j * 14 <= last_invaderer_sprite);
-						sprites[first_invaderer_sprite + i + j * 14].init(						 // remOved and replAced num_cols with 11
+						sprites[first_invaderer_sprite + i + j * 14].init(			
 							invaderer, ((float)i - num_cols * 0.5f) * 0.4f, 2.75f /*  <-- INCREASE TO HAVE ENEMIES START FROM HIGHER */ - ((float)j * 0.37f), /* <-- increases height between enemies */ 0.25f, 0.25f);
 					}
 				}
 			}
-
 		}
-		// }
-
-
-
-
 
 		// fire button (space)
 		void fire_missiles() {
 			if (missiles_disabled) {
 				--missiles_disabled;
 			}
-			else if (is_key_going_down(' ')) {
+			else if (is_key_going_down(' ') && num_lives % 2 != 0)  {					//will shoot only if daytime (light blue coloured background)
 
 				// find a missile
 				for (int i = 0; i != num_missiles; ++i) {
 					if (!sprites[first_missile_sprite + i].is_enabled()) {
 						sprites[first_missile_sprite + i].set_relative(sprites[ship_sprite], 0, 0.5f);
-						sprites[first_missile_sprite + i].is_enabled() = true; // lets it smoothly go up
+						sprites[first_missile_sprite + i].is_enabled() = true; 
 						missiles_disabled = 5;
-						ALuint source = get_sound_source();
-						alSourcei(source, AL_BUFFER, whoosh);
-						alSourcePlay(source);
+						ALuint source2 = get_sound_source();
+						alSourcei(source2, AL_BUFFER, whoosh);
+						alSourcePlay(source2);
 						break;
 					}
 				}
 			}
 		}
 
-		//INVADER SHOOTS BOMBS
-
-
-		// pick and invader and fire a bomb INVADER SHOOTS BOMBS
+		// pick and invader and fire a bomb 
 		void fire_bombs() {
 			if (bombs_disabled) {
 				--bombs_disabled;
@@ -380,12 +336,12 @@ namespace octet {
 				sprite &ship = sprites[ship_sprite];
 				for (int j = randomizer.get(0, num_invaderers); j < num_invaderers; ++j) {
 					sprite &invaderer = sprites[first_invaderer_sprite + j];
-					if (invaderer.is_enabled() && invaderer.is_above(ship, 2.0f)) {											//range of enemy monkeys shots																										// find a bomb
+					if (invaderer.is_enabled() && invaderer.is_above(ship, 2.0f)) {																																					// find a bomb
 						for (int i = 0; i != num_bombs; ++i) {
 							if (!sprites[first_bomb_sprite + i].is_enabled()) {
 								sprites[first_bomb_sprite + i].set_relative(invaderer, 0, -0.25f);
 								sprites[first_bomb_sprite + i].is_enabled() = true;
-								bombs_disabled = 0;																					// here is frequency of shooting
+								bombs_disabled = 0;																					
 								ALuint source = get_sound_source();
 								alSourcei(source, AL_BUFFER, whoosh);
 								alSourcePlay(source);
@@ -413,7 +369,6 @@ namespace octet {
 							missile.is_enabled() = false;
 							missile.translate(20, 0);
 							on_hit_invaderer();
-
 							goto next_missile;
 						}
 					}
@@ -449,55 +404,31 @@ namespace octet {
 			}
 		}
 
-		// move the array of enemies
-		void move_invaders(float dx, float dy) {
-			for (int j = 0; j != num_invaderers; ++j) {
-				sprite &invaderer = sprites[first_invaderer_sprite + j];
-				if (invaderer.is_enabled()) {
-					invaderer.translate(dx, dy);
-				}
-			}
-		}
-
-		// check if any invaders hit the sides.
-		bool invaders_collide(sprite &border) {
-			for (int j = 0; j != num_invaderers; ++j) {
-				sprite &invaderer = sprites[first_invaderer_sprite + j];
-				if (invaderer.is_enabled() && invaderer.collides_with(border)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-
-		void gameOverCondition() {
+		void gameOverCondition() {												// called when the game has finished and will send next wave to player if he has succeded
 
 
 			initEnemies();
 			game_over = false;
 			reWave = true;
-			sprites[game_over_sprite].translate(-40, 0.2);
+			sprites[game_over_sprite].translate(-40, 0.2);						// sprites are moved out of the screen and will be re-used when needed
 			sprites[restart_sprite].translate(-48.3, -2.2);
 
 			sprites[success_sprite].translate(-40, 0);
-			sprites[nextWave_sprite].translate(-48.3, -2.2);
-
+			sprites[nextWave_sprite].translate(-48.3, -2.2);		
 		}
+				
 
+		void initHolyBananas() {																// initialization of magic bananas that give life once taken
 
-		void initHolyBananas() {
+			srand(static_cast<unsigned>(time(0)));												// with this our rand() function will always start differently. without it rand() would always start and end in the same way (pseudo-randomly)
 
-			srand(static_cast<unsigned>(time(0)));												 // with this our rand() function will always start differently. without it rand() would always start and end in the
-
-			sprite &theHolyBanana = sprites[holyBanana_sprite];									//same way (pseudo-randomly)
+			sprite &theHolyBanana = sprites[holyBanana_sprite];									
 			sprite &ship = sprites[ship_sprite];
 
-			if (ship.collides_with(theHolyBanana)) {											// when our character collides with the blue banana
+			if (ship.collides_with(theHolyBanana)) {											// when our character collides with the magic banana
 				GLuint holyBanana = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/holyBomb.gif");
 
 				vector<vector<float>> xypoints(10, vector<float>(2));							// A multidimentional vector with 10 rows and 2 columns
-
 
 				int r = 0;
 				int f = 0;
@@ -513,10 +444,10 @@ namespace octet {
 				}
 
 
-				int randCount = rand() % 10 + 1;
+				int randCount = rand() % 10 + 1;												// gets a random value from 1 - 10
 
 
-				switch (randCount) {
+				switch (randCount) {															// use the random value along with the coordinates to spawn the magic banana in different locations drawn from our text file
 
 				case 1:
 					sprites[holyBanana_sprite].init(holyBanana, xypoints[0][0], xypoints[0][1], 0.25f, 0.25f);
@@ -550,7 +481,7 @@ namespace octet {
 					break;
 				}
 
-				num_lives = num_lives + 1;
+				num_lives = num_lives + 1;																			// colliding with the magic banana will give the player an extra life!
 
 			}
 		}
@@ -586,6 +517,8 @@ namespace octet {
 			glEnableVertexAttribArray(attribute_uv);
 
 			glDrawElements(GL_TRIANGLES, num_quads * 6, GL_UNSIGNED_INT, indices);
+
+
 		}
 
 	public:
@@ -656,9 +589,11 @@ namespace octet {
 			cur_source = 0;
 			alGenSources(num_sound_sources, sources);
 
-			/* ALuint source = get_sound_source();
-			alSourcei(source, AL_BUFFER, sandbox);
-			alSourcePlay(source);*/   // have to figure out why music speed decreases + find how to loop
+			//ALuint source = get_sound_source();											If I want to include background music! but decided not to in the end
+			//alSourcei(source, AL_BUFFER, sandbox);
+			//alSourcePlay(source);
+
+	
 
 			// sundry counters and game state.
 			missiles_disabled = 0;
@@ -702,22 +637,6 @@ namespace octet {
 
 			initHolyBananas();
 
-			// gameOverCondition();
-			// move_invaders(invader_velocity, 0);
-
-
-			// HERE IS BORDER COLLISION THAT LOWERS THEM ALL DOWN												// MOVEMENT OF INVADER RIGHT HERE!
-
-
-			//  move_invaders(0, -invader_velocity);
-			//  sprites[num_invaderers -5].translate(0, invader_velocity);
-
-
-			sprite &border = sprites[first_border_sprite + (invader_velocity < 0 ? 2 : 3)];
-			if (invaders_collide(border)) {
-				invader_velocity = -invader_velocity;
-				//  move_invaders(invader_velocity, -0.1f);
-			}
 		}
 
 		// this is called to draw the world
@@ -727,9 +646,17 @@ namespace octet {
 			// set a viewport - includes whole window area
 			glViewport(x, y, w, h);
 
+			
 			// clear the background to blue
-			glClearColor(0, 0.8f, 1, 1);
+			if (num_lives % 2 == 0){							// if lives lives/2 does leaves a remainder then we will have day sky! else night sky
+				glClearColor(0.2f, 0.0f, 0.5f, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}else {
+				glClearColor(0, 0.8f, 1, 1);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}
+
+		
 
 			// don't allow Z buffer depth testing (closer objects are always drawn in front of far ones)
 			glDisable(GL_DEPTH_TEST);

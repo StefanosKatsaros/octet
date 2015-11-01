@@ -36,11 +36,19 @@ namespace octet { namespace shaders {
       // after the rasterizer breaks the triangle into fragments
       // this is called for every fragment
       // it outputs gl_FragColor, the color of the pixel and inputs uv_
-      const char fragment_shader[] = SHADER_STR(
-        varying vec2 uv_;
-        uniform sampler2D sampler;
-        void main() { gl_FragColor = texture2D(sampler, uv_); }
-      );
+	  const char fragment_shader[] = SHADER_STR(
+		  varying vec2 uv_;
+	  uniform sampler2D sampler;
+
+	
+	  void main() {
+			
+		  float x = 1;
+		
+		  gl_FragColor = vec4(x, 1, 0.3, 1.0) *  texture2D(sampler, uv_);
+	  
+	  }
+	  );
     
       // use the common shader code to compile and link the shaders
       // the result is a shader program
