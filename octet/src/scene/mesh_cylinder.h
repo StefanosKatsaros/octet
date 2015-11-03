@@ -21,7 +21,13 @@ namespace octet { namespace scene {
       set_default_attributes();
       set_aabb(cylinder.get_aabb().get_transform(transform));
       update();
+
+
+
+
     }
+
+
 
   public:
     RESOURCE_META(mesh_cylinder)
@@ -48,6 +54,7 @@ namespace octet { namespace scene {
       }
     }
 
+
     #ifdef OCTET_BULLET
       /// Get a bullet shape object for this mesh
       btCollisionShape *get_bullet_shape() {
@@ -58,6 +65,10 @@ namespace octet { namespace scene {
       btCollisionShape *get_static_bullet_shape() {
         return new btCylinderShapeZ(btVector3(cylinder.get_radius(), cylinder.get_radius(), cylinder.get_half_extent()));
       }
+
+
+
+
     #endif
   };
 }}

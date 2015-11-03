@@ -4,11 +4,19 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
+
+
+
+
+
+
 namespace octet {
   /// Scene containing a box with octet.
   class example_shapes : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;
+
+
 
   public:
     example_shapes(int argc, char **argv) : app(argc, argv) {
@@ -16,6 +24,7 @@ namespace octet {
 
     ~example_shapes() {
     }
+
 
     /// this is called once OpenGL is initialized
     void app_init() {
@@ -35,14 +44,23 @@ namespace octet {
       mat.translate(0, 10, 0);
       app_scene->add_shape(mat, new mesh_box(vec3(2, 2, 2)), red, true);
 
+
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
       app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
+
+	  mat.loadIdentity();
+	  mat.translate(3, 9, 0);
+	  app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), green, true);
+
 
       // ground
       mat.loadIdentity();
       mat.translate(0, -1, 0);
       app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
+		
+	
+
     }
 
     /// this is called to draw the world
@@ -53,9 +71,12 @@ namespace octet {
 
       // update matrices. assume 30 fps.
       app_scene->update(1.0f/30);
-
       // draw the scene
       app_scene->render((float)vx / vy);
+
+
+
+
     }
   };
 }

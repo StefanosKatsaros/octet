@@ -1,25 +1,26 @@
-# octet
+					**Monkey Invasion**
 
-Octet is a framework for teaching OpenGL and the rudiments of game programming such
-as Geometry construction, Shaders, Matrices, Rigid body Physics and Fluid dynamics.
+This document will provide an understanding to the process that led me to create this game for the ‘Intro to Game Programming’ course. To begin with I will first explain the logic of the game and what the end user will actually be doing. (See file path and youtube link at end.)
 
-It has a number of examples in the src/examples directory.
+You control an orange monkey and are trying to destroy the enemy monkeys above by throwing bananas at them all while they are throwing red bananas at you. You must evade their red bananas by moving freely around the territory and try to gather the blue magic bananas that are spawned randomly and give you extra lives. The game’s background keeps changing from day to night (light blue to dark blue) whenever you get shot or pick up a magic banana. You can only shoot bananas during daytime and therefore cannot stay still and the game leaves you constantly alert. When all evil monkeys have been perished you are prompted to enter the next stage and keep on increasing your score until you run out of lives.
 
-To use with visual studio, fork this repository into your own account and then
-"Clone Into Desktop" using the GitHub tool and open one of the .sln files in src/examples.
+I started off by editing the 2d game ‘space invaderers’ in octet, changing parameters such as movement and colors and modifying the assets. I increased the number of enemies, set them to stay still and for them to shoot randomly, while enlarging their range field. Therefore they won’t necessarily fire only on the player’s current location, thus making it harder for him to move around. The enemy initialization occurs within a function named initEnemies(), and is called at start and everytime the user gets to the next level. Shots are constantly fired, but when the player is shot there is a small time gap which allows the player to think how he will proceed. 
+The player has 5 lives, has infinite banana bullets and is free to move around the entire xy area. Each one of his banana shot will destroy an enemy monkey, however though he cannot always shoot. The game works on a day-time night-time theme, where when night falls the player can’t shoot and must avoid enemy bullets. When he gets shot or he picks up a magical banana and the night becomes day he is granted the ability to shoot again.
+Since the project required drawing data from an external file I created the magic bananas. In the game the magic bananas spawn randomly after being picked up, however they are and are not random. To begin with there are 10 set xy positions which are drawn from the points.txt file. Therefore anyone can simply change the values using the external file if he wants the magic banana to appear in different points. This is achieved using a multidimentional vector which contains empty float values, and using *ifstream* to retrieve the values from the text document and one by one place them in the x and y positions. Therefore the first value will go in x position [0][0] and the second in y position [0][1] and with this line of code “sprites[holyBanana_sprite].init(holyBanana, xypoints[0][0], xypoints[0][1], 0.25f, 0.25f);” we use those points to spawn the banana. However in order to add randomness to this I also used an extra library (I am aware that it is recommended to use a minimum amount of libraries and avoid them when able, but since the game is rather small and performance isn’t an issue I wanted to implemented these extra features I used the rand() % 10 + 1; which creates a random value from 1 to 10 (arrays start from [0] and that’s why we have the +1). Everytime the player gets a hold of a magic banana he gets an extra life, day turns into night and vice versa, and the magic banana is respawned in a random location based on the random number that is rolled and the position we have set in the text document. Finally it is worth mentioning the “srand(static_cast<unsigned>(time(0)));	” trick that allows the first value to always be random. Otherwise each time the user plays the game the values will be processed in the same order. Moreover the magic banana might respawn in the same position and give extra lives to the player. These is a feature I did not wish to remove since the game is a bit hard and it could offer the player a short breath.
+Furthermore an important feature is the player continuability after losing or winning the game. Therefore the user is prompted with a restart option when he has lost where by inputing ‘R’ we re-initialize the entire game and all begins from scratch, but when the user has won the game (meaning that he has killed all living enemy monkeys) he is prompted with the option to continue to the next wave by inputing ‘Y’, and when he does all are reset apart from the score and the player’s life. Therefore the player continues until he runs out of lives.
+Furthermore what is a game without colour? To begin with each sprite (enemies, player, bullets etc.) has its own colour which are however changed using the fragment shader. By changing the parameters and adding additional code to the texture_shader.h I created the “gl_FragColor = vec4(x, 1, 0.3, 1.0) *  texture2D(sampler, uv_);” which changes the colour of the sprites. However even if we didn’t have coloured sprites at first place it would still do the trick, with slightly different results that is. When it comes to the background of the game I have applied a method for it to change during runtime whenever a life is gained or lost. Therefore starting with a light blue colour, the glClearColor() will change to a dark blue color (The way this happens is by dividing the number of lives the player has left and if it has a remainder then let it be light blue, else dark blue).
 
-There is a python script for generating your own projects from a template.
+Throughout the process of developing this small simple yet playful game, I understood the notion of how code is used to develop a game and likewise how to create code for a game, I learned how to draw data from an external file and use it in a game (in my case to store the ‘positions’ in a multidimentional vector), thus making it easy for a non-programmer to manipulate, I discovered and grasped the concept of using texture and fragment shaders, thus understanding that it is not as simple as adding colours in a sprite beforehand, and have understood how a game works during runtime, what is precompiled and what is postprocessed. Finally I have comprehended how memory works and how badly written code and code logic can create errors and may be fatal to killing a project.
 
-From the octet directory run:
 
-packaging\make_example.py my_example
+File Path to .sln
+octet\src\examples\example_invaderers\example_invaderers.sln
 
-To create your own project in src/examples
 
-Examples should also work with Xcode, although testing is a lot less thorough. If it does not work, send
-me a pull request with fixes, please...
+Youtube Link
+https://www.youtube.com/watch?v=NYr9mgYavhY
 
-Octet is a bit unusual in that it does not use external libraries such as libjpeg or zlib.
-These are implemented in source form in the framework so that you can understand the code.
-The source of most academic libraries is almost unreadble, so we aim to help your understanding
-of coding codecs such as GIF, JPEG, ZIP and so on.
+
+
+
+

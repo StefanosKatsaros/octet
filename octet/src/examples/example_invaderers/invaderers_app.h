@@ -235,7 +235,7 @@ namespace octet {
 				game_over = true;
 				sprites[success_sprite].translate(-20, 0);
 				sprites[nextWave_sprite].translate(-18.3, -2.2);
-
+				live_invaderers = num_invaderers - 7;
 			}
 		}
 
