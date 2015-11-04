@@ -1,5 +1,8 @@
 					**Monkey Invasion**
 
+Should be midleware
+
+
 This document will provide an understanding to the process that led me to create this game for the ‘Intro to Game Programming’ course. To begin with I will first explain the logic of the game and what the end user will actually be doing. (See file path and youtube link at end.)
 
 You control an orange monkey and are trying to destroy the enemy monkeys above by throwing bananas at them all while they are throwing red bananas at you. You must evade their red bananas by moving freely around the territory and try to gather the blue magic bananas that are spawned randomly and give you extra lives. The game’s background keeps changing from day to night (light blue to dark blue) whenever you get shot or pick up a magic banana. You can only shoot bananas during daytime and therefore cannot stay still and the game leaves you constantly alert. When all evil monkeys have been perished you are prompted to enter the next stage and keep on increasing your score until you run out of lives.
