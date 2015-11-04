@@ -16,8 +16,7 @@ namespace octet {
     // scene for drawing box
     ref<visual_scene> app_scene;
 
-
-
+	
   public:
     example_shapes(int argc, char **argv) : app(argc, argv) {
     }
@@ -36,6 +35,8 @@ namespace octet {
       material *green = new material(vec4(0, 1, 0, 1));
       material *blue = new material(vec4(0, 0, 1, 1));
 
+	  material *other = new material(vec4(0.3, 0.2, 0.5, 1));
+
       mat4t mat;
       mat.translate(-3, 6, 0);
       app_scene->add_shape(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, true);
@@ -51,7 +52,7 @@ namespace octet {
 
 	  mat.loadIdentity();
 	  mat.translate(3, 9, 0);
-	  app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), green, true);
+	  app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 6, 1)), other, true);
 
 
       // ground
